@@ -1,63 +1,131 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bot, Boxes, Building2, Sparkles } from 'lucide-react';
+import {
+  Bot,
+  Boxes,
+  Building2,
+  Sparkles,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import { portfolioData } from '../data/portfolioData';
 
 export const ProductFocus: React.FC = () => {
   /*
    * ============================================================
+   * PHILOSOPHIES
+   * ============================================================
+   */
+
+  const philosophies = [
+    {
+      rule: '01',
+      text: "Don't just learn the technology. Understand the problem it solves, why the architecture works, and how to turn it into a useful product.",
+      footer:
+        'PRODUCT THINKING → TECHNICAL DEPTH → USEFUL OUTCOMES',
+    },
+    {
+      rule: '02',
+      text: 'Start with the business problem, then use data and AI to create measurable product outcomes.',
+      footer:
+        'PROBLEM → DATA → INTELLIGENCE → OUTCOME',
+    },
+    {
+      rule: '03',
+      text: 'AI should amplify human judgment, not replace the people responsible for the decision.',
+      footer:
+        'AI → AUGMENTATION → BETTER DECISIONS',
+    },
+    {
+      rule: '04',
+      text: 'Build small, learn quickly, measure honestly, and continuously improve what creates value.',
+      footer:
+        'SHIP → LEARN → MEASURE → IMPROVE',
+    },
+  ];
+
+  /*
+   * ============================================================
    * PHILOSOPHY TYPEWRITER STATE
    * ============================================================
    */
-  const [displayedQuote, setDisplayedQuote] = useState('');
-  const [quoteStarted, setQuoteStarted] = useState(false);
 
-  const quoteRef = useRef<HTMLDivElement>(null);
+  const [activePhilosophy, setActivePhilosophy] =
+    useState(0);
+
+  const [displayedQuote, setDisplayedQuote] =
+    useState('');
+
+  const [quoteStarted, setQuoteStarted] =
+    useState(false);
+
+  const [isDeletingQuote, setIsDeletingQuote] =
+    useState(false);
+
+  const quoteRef =
+    useRef<HTMLDivElement>(null);
+
+  const currentPhilosophy =
+    philosophies[activePhilosophy];
 
   /*
    * ============================================================
    * 3D CAROUSEL STATE
    * ============================================================
    */
-  const [rotation, setRotation] = useState(0);
-  const [isHoveringCarousel, setIsHoveringCarousel] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
-  const rotationRef = useRef(0);
-  const dragStartX = useRef(0);
-  const dragStartRotation = useRef(0);
-  const animationFrameRef = useRef<number | null>(null);
+  const [rotation, setRotation] =
+    useState(0);
+
+  const [isHoveringCarousel, setIsHoveringCarousel] =
+    useState(false);
+
+  const [isDragging, setIsDragging] =
+    useState(false);
+
+  const rotationRef =
+    useRef(0);
+
+  const dragStartX =
+    useRef(0);
+
+  const dragStartRotation =
+    useRef(0);
+
+  const animationFrameRef =
+    useRef<number | null>(null);
 
   /*
    * ============================================================
    * KEEP ROTATION REF IN SYNC
    * ============================================================
    */
+
   useEffect(() => {
     rotationRef.current = rotation;
   }, [rotation]);
 
   /*
    * ============================================================
-   * PHILOSOPHY — START TYPEWRITER WHEN VISIBLE
+   * START TYPEWRITER WHEN PHILOSOPHY ENTERS VIEW
    * ============================================================
    */
+
   useEffect(() => {
     const element = quoteRef.current;
 
     if (!element) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setQuoteStarted(true);
-          observer.disconnect();
+    const observer =
+      new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setQuoteStarted(true);
+            observer.disconnect();
+          }
+        },
+        {
+          threshold: 0.35,
         }
-      },
-      {
-        threshold: 0.35,
-      }
-    );
+      );
 
     observer.observe(element);
 
@@ -66,34 +134,118 @@ export const ProductFocus: React.FC = () => {
 
   /*
    * ============================================================
-   * PHILOSOPHY — TYPEWRITER ANIMATION
+   * PHILOSOPHY TYPEWRITER
+   *
+   * TYPE
+   *   ↓
+   * PAUSE
+   *   ↓
+   * DELETE
+   *   ↓
+   * NEXT PHILOSOPHY
+   *   ↓
+   * REPEAT
    * ============================================================
    */
+
   useEffect(() => {
     if (!quoteStarted) return;
 
-    const quote = portfolioData.approachQuote;
+    const quote =
+      currentPhilosophy.text;
 
-    let index = 0;
+    let timeout:
+      ReturnType<typeof setTimeout>;
 
-    setDisplayedQuote('');
+    /*
+     * TYPE
+     */
+    if (
+      !isDeletingQuote &&
+      displayedQuote.length < quote.length
+    ) {
+      timeout = setTimeout(() => {
+        setDisplayedQuote(
+          quote.slice(
+            0,
+            displayedQuote.length + 1
+          )
+        );
+      }, 28);
+    }
 
-    const interval = window.setInterval(() => {
-      index += 1;
+    /*
+     * PAUSE AFTER COMPLETE THOUGHT
+     */
+    else if (
+      !isDeletingQuote &&
+      displayedQuote.length === quote.length
+    ) {
+      timeout = setTimeout(() => {
+        setIsDeletingQuote(true);
+      }, 2200);
+    }
 
-      setDisplayedQuote(
-        quote.slice(0, index)
-      );
+    /*
+     * DELETE
+     */
+    else if (
+      isDeletingQuote &&
+      displayedQuote.length > 0
+    ) {
+      timeout = setTimeout(() => {
+        setDisplayedQuote(
+          quote.slice(
+            0,
+            displayedQuote.length - 1
+          )
+        );
+      }, 16);
+    }
 
-      if (index >= quote.length) {
-        window.clearInterval(interval);
-      }
-    }, 28);
+    /*
+     * MOVE TO NEXT PHILOSOPHY
+     */
+    else if (
+      isDeletingQuote &&
+      displayedQuote.length === 0
+    ) {
+      timeout = setTimeout(() => {
+        setActivePhilosophy(
+          (current) =>
+            (current + 1) %
+            philosophies.length
+        );
+
+        setIsDeletingQuote(false);
+      }, 350);
+    }
 
     return () => {
-      window.clearInterval(interval);
+      clearTimeout(timeout);
     };
-  }, [quoteStarted]);
+  }, [
+    quoteStarted,
+    displayedQuote,
+    isDeletingQuote,
+    activePhilosophy,
+    currentPhilosophy.text,
+  ]);
+
+  /*
+   * ============================================================
+   * MANUAL PHILOSOPHY SELECTION
+   * ============================================================
+   */
+
+  const selectPhilosophy = (
+    index: number
+  ) => {
+    setActivePhilosophy(index);
+    setDisplayedQuote('');
+    setIsDeletingQuote(false);
+    setQuoteStarted(true);
+  };
 
   /*
    * ============================================================
@@ -103,50 +255,79 @@ export const ProductFocus: React.FC = () => {
    * Stops while hovering or dragging.
    * ============================================================
    */
-  useEffect(() => {
-    let lastTime = performance.now();
 
-    const animate = (currentTime: number) => {
-      const delta = currentTime - lastTime;
+  useEffect(() => {
+    let lastTime =
+      performance.now();
+
+    const animate = (
+      currentTime: number
+    ) => {
+      const delta =
+        currentTime - lastTime;
+
       lastTime = currentTime;
 
-      if (!isHoveringCarousel && !isDragging) {
-        const movement = delta * 0.01;
+      if (
+        !isHoveringCarousel &&
+        !isDragging
+      ) {
+        const movement =
+          delta * 0.01;
 
-        rotationRef.current -= movement;
+        rotationRef.current -=
+          movement;
 
-        setRotation(rotationRef.current);
+        setRotation(
+          rotationRef.current
+        );
       }
 
       animationFrameRef.current =
-        requestAnimationFrame(animate);
+        requestAnimationFrame(
+          animate
+        );
     };
 
     animationFrameRef.current =
-      requestAnimationFrame(animate);
+      requestAnimationFrame(
+        animate
+      );
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (
+        animationFrameRef.current
+      ) {
+        cancelAnimationFrame(
+          animationFrameRef.current
+        );
       }
     };
-  }, [isHoveringCarousel, isDragging]);
+  }, [
+    isHoveringCarousel,
+    isDragging,
+  ]);
 
   /*
    * ============================================================
    * MOUSE / TOUCH WHEEL ROTATION
    * ============================================================
    */
+
   const handleWheel = (
     event: React.WheelEvent<HTMLDivElement>
   ) => {
     event.preventDefault();
 
-    const movement = event.deltaY * 0.32;
+    const movement =
+      event.deltaY * 0.32;
 
-    rotationRef.current -= movement;
+    rotationRef.current -=
+      movement;
 
-    setRotation(rotationRef.current);
+    setRotation(
+      rotationRef.current
+    );
   };
 
   /*
@@ -154,13 +335,17 @@ export const ProductFocus: React.FC = () => {
    * POINTER DRAG
    * ============================================================
    */
+
   const handlePointerDown = (
     event: React.PointerEvent<HTMLDivElement>
   ) => {
     setIsDragging(true);
 
-    dragStartX.current = event.clientX;
-    dragStartRotation.current = rotationRef.current;
+    dragStartX.current =
+      event.clientX;
+
+    dragStartRotation.current =
+      rotationRef.current;
 
     event.currentTarget.setPointerCapture(
       event.pointerId
@@ -173,15 +358,19 @@ export const ProductFocus: React.FC = () => {
     if (!isDragging) return;
 
     const distance =
-      event.clientX - dragStartX.current;
+      event.clientX -
+      dragStartX.current;
 
     const nextRotation =
       dragStartRotation.current +
       distance * 0.45;
 
-    rotationRef.current = nextRotation;
+    rotationRef.current =
+      nextRotation;
 
-    setRotation(nextRotation);
+    setRotation(
+      nextRotation
+    );
   };
 
   const handlePointerUp = (
@@ -203,46 +392,86 @@ export const ProductFocus: React.FC = () => {
    * ICON SYSTEM
    * ============================================================
    */
-  const getIcon = (iconName: string) => {
+
+  const getIcon = (
+    iconName: string
+  ) => {
     switch (iconName) {
       case 'Building2':
         return (
-          <Building2 className="w-6 h-6 text-[#4A7860]" />
+          <Building2
+            className="
+              w-6
+              h-6
+              text-[#4A7860]
+            "
+          />
         );
 
       case 'Bot':
         return (
-          <Bot className="w-6 h-6 text-[#4A7860]" />
+          <Bot
+            className="
+              w-6
+              h-6
+              text-[#4A7860]
+            "
+          />
         );
 
       case 'Boxes':
         return (
-          <Boxes className="w-6 h-6 text-[#4A7860]" />
+          <Boxes
+            className="
+              w-6
+              h-6
+              text-[#4A7860]
+            "
+          />
         );
 
       default:
         return (
-          <Sparkles className="w-6 h-6 text-[#4A7860]" />
+          <Sparkles
+            className="
+              w-6
+              h-6
+              text-[#4A7860]
+            "
+          />
         );
     }
   };
 
+  /*
+   * ============================================================
+   * PHILOSOPHY COMPLETION
+   * ============================================================
+   */
+
   const quoteComplete =
     displayedQuote.length ===
-    portfolioData.approachQuote.length;
+    currentPhilosophy.text.length;
+
+  /*
+   * ============================================================
+   * RENDER
+   * ============================================================
+   */
 
   return (
     <section
       id="focus"
       aria-label="What I'm Building & Focus"
       className="
-        py-24
+        py-14
+        sm:py-16
         px-6
         sm:px-12
         lg:px-20
         max-w-7xl
         mx-auto
-        space-y-16
+        space-y-10
         border-t
         border-[#2A2A22]
       "
@@ -251,6 +480,7 @@ export const ProductFocus: React.FC = () => {
       {/* ========================================================
           SECTION HEADER
       ======================================================== */}
+
       <div
         className="
           flex
@@ -260,11 +490,12 @@ export const ProductFocus: React.FC = () => {
           justify-between
           border-b
           border-[#2A2A22]
-          pb-6
-          gap-4
+          pb-4
+          gap-3
         "
       >
-        <div className="space-y-2">
+
+        <div className="space-y-1.5">
 
           <div
             className="
@@ -278,7 +509,10 @@ export const ProductFocus: React.FC = () => {
               gap-2
             "
           >
-            <span>PILLARS // 02</span>
+
+            <span>
+              PILLARS // 03
+            </span>
 
             <span
               className="
@@ -289,9 +523,15 @@ export const ProductFocus: React.FC = () => {
               "
             />
 
-            <span className="text-[#8C887F]">
-              WHAT I'M BUILDING & CURRENT FOCUS
+            <span
+              className="
+                text-[#8C887F]
+              "
+            >
+              WHAT I'M BUILDING &
+              CURRENT FOCUS
             </span>
+
           </div>
 
           <h2
@@ -300,13 +540,13 @@ export const ProductFocus: React.FC = () => {
               font-semibold
               text-3xl
               sm:text-4xl
-              lg:text-5xl
               text-[#FAF8F5]
               tracking-tight
             "
           >
             Product Vision & Focus
           </h2>
+
         </div>
 
         <div
@@ -318,17 +558,24 @@ export const ProductFocus: React.FC = () => {
         >
           PRODUCT × AI × DATA × AEC
         </div>
+
       </div>
 
 
       {/* ========================================================
-          PHILOSOPHY — TYPEWRITER
+          PHILOSOPHY — COMPACT TYPEWRITER
+          
+          IMPORTANT:
+          No border-y.
+          No large container.
+          No large vertical gap.
       ======================================================== */}
+
       <motion.div
         ref={quoteRef}
         initial={{
           opacity: 0,
-          y: 20,
+          y: 10,
         }}
         whileInView={{
           opacity: 1,
@@ -339,31 +586,29 @@ export const ProductFocus: React.FC = () => {
           amount: 0.3,
         }}
         transition={{
-          duration: 0.7,
+          duration: 0.6,
         }}
         className="
           relative
-          border-y
-          border-[#2A2A22]
-          py-8
-          sm:py-12
+          py-2
+          sm:py-3
           overflow-hidden
         "
       >
 
-        {/* Top animated accent */}
+        {/* Small accent only */}
         <motion.div
           initial={{
             width: 0,
           }}
           whileInView={{
-            width: '140px',
+            width: '90px',
           }}
           viewport={{
             once: true,
           }}
           transition={{
-            duration: 1.1,
+            duration: 0.8,
             ease: [0.16, 1, 0.3, 1],
           }}
           className="
@@ -375,62 +620,72 @@ export const ProductFocus: React.FC = () => {
           "
         />
 
-        {/* Label */}
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 8,
-          }}
-          animate={{
-            opacity: quoteStarted ? 1 : 0,
-            y: quoteStarted ? 0 : 8,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
+        {/* Philosophy label */}
+
+        <div
           className="
             font-mono
-            text-[11px]
+            text-[10px]
+            sm:text-xs
             text-[#8C887F]
             uppercase
             tracking-[0.2em]
             flex
             items-center
             gap-3
-            mb-6
+            mb-4
+            pt-2
           "
         >
+
           <span>
             PHILOSOPHY
           </span>
 
-          <span className="text-[#4A7860]">
-            / RULE 01
+          <span
+            className="
+              text-[#4A7860]
+            "
+          >
+            / RULE {currentPhilosophy.rule}
           </span>
-        </motion.div>
 
-        {/* Typed quote */}
-        <div className="max-w-5xl">
+        </div>
+
+
+        {/* ======================================================
+            TYPED THOUGHT
+        ====================================================== */}
+
+        <div
+          className="
+            max-w-4xl
+            min-h-[82px]
+            sm:min-h-[78px]
+          "
+        >
 
           <blockquote
             className="
               font-display
-              text-2xl
-              sm:text-3xl
-              lg:text-4xl
-              xl:text-[42px]
+              text-lg
+              sm:text-xl
+              md:text-2xl
+              lg:text-[28px]
               text-[#FAF8F5]
               font-medium
-              leading-[1.18]
+              leading-[1.3]
               tracking-tight
             "
           >
+
             <span>
               "
               {displayedQuote}
             </span>
 
-            {/* Typing cursor */}
+            {/* Cursor */}
+
             {quoteStarted && (
               <motion.span
                 animate={{
@@ -452,70 +707,104 @@ export const ProductFocus: React.FC = () => {
               </motion.span>
             )}
 
-            {/* Closing quote only after typing finishes */}
+            {/* Closing quote */}
+
             {quoteComplete && (
               <span>
                 "
               </span>
             )}
+
           </blockquote>
+
         </div>
 
-        {/* Supporting metadata */}
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: quoteComplete ? 1 : 0,
-          }}
-          transition={{
-            duration: 0.7,
-          }}
+
+        {/* ======================================================
+            PHILOSOPHY FOOTER
+        ====================================================== */}
+
+        <div
           className="
-            mt-6
+            mt-3
             font-mono
-            text-[10px]
-            sm:text-xs
+            text-[9px]
+            sm:text-[10px]
             text-[#8C887F]
-            uppercase
             tracking-wider
           "
         >
-          PRODUCT THINKING → TECHNICAL DEPTH → USEFUL OUTCOMES
-        </motion.div>
+          {currentPhilosophy.footer}
+        </div>
 
-        {/* Bottom accent */}
-        <motion.div
-          initial={{
-            width: 0,
-          }}
-          animate={{
-            width: quoteComplete
-              ? '100%'
-              : '0%',
-          }}
-          transition={{
-            duration: 1,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+
+        {/* ======================================================
+            PHILOSOPHY INDICATORS
+        ====================================================== */}
+
+        <div
           className="
-            absolute
-            bottom-0
-            left-0
-            h-px
-            bg-[#4A7860]/35
+            flex
+            items-center
+            gap-2
+            pt-4
           "
-        />
+        >
+
+          {philosophies.map(
+            (
+              philosophy,
+              index
+            ) => (
+
+              <button
+                key={philosophy.rule}
+                type="button"
+                aria-label={
+                  `Show philosophy ${index + 1}`
+                }
+                aria-current={
+                  activePhilosophy === index
+                    ? 'true'
+                    : undefined
+                }
+                onClick={() =>
+                  selectPhilosophy(index)
+                }
+                className={`
+                  h-[2px]
+                  transition-all
+                  duration-300
+                  cursor-pointer
+
+                  ${
+                    activePhilosophy === index
+                      ? 'w-10 bg-[#4A7860]'
+                      : 'w-6 bg-[#2A2A22] hover:bg-[#8C887F]'
+                  }
+                `}
+              />
+
+            )
+          )}
+
+        </div>
+
       </motion.div>
 
 
       {/* ========================================================
           CORE FOCUS PILLARS
       ======================================================== */}
-      <div className="space-y-8">
+
+      <div
+        className="
+          space-y-6
+        "
+      >
 
         {/* Heading */}
+
         <div
           className="
             flex
@@ -523,6 +812,7 @@ export const ProductFocus: React.FC = () => {
             justify-between
           "
         >
+
           <div>
 
             <div
@@ -546,7 +836,8 @@ export const ProductFocus: React.FC = () => {
                 mt-2
               "
             >
-              Where product strategy meets intelligent systems.
+              Where product strategy meets
+              intelligent systems.
             </div>
 
           </div>
@@ -562,12 +853,14 @@ export const ProductFocus: React.FC = () => {
           >
             03 SYSTEMS
           </div>
+
         </div>
 
 
         {/* ======================================================
             3D ROTATING PRESENTATION
         ====================================================== */}
+
         <div
           className="
             relative
@@ -600,6 +893,7 @@ export const ProductFocus: React.FC = () => {
           {/* ====================================================
               AMBIENT BACKGROUND
           ==================================================== */}
+
           <div
             className="
               absolute
@@ -617,6 +911,7 @@ export const ProductFocus: React.FC = () => {
           />
 
           {/* Horizontal light field */}
+
           <div
             className="
               absolute
@@ -635,9 +930,11 @@ export const ProductFocus: React.FC = () => {
           {/* ====================================================
               FLOOR / ELLIPTICAL ORBIT
           ==================================================== */}
+
           <motion.div
             animate={{
-              rotate: rotation * 0.12,
+              rotate:
+                rotation * 0.12,
             }}
             transition={{
               duration: 0,
@@ -679,6 +976,7 @@ export const ProductFocus: React.FC = () => {
           {/* ====================================================
               3D CAROUSEL
           ==================================================== */}
+
           <motion.div
             className="
               absolute
@@ -694,7 +992,8 @@ export const ProductFocus: React.FC = () => {
             style={{
               marginLeft: '-155px',
               marginTop: '-265px',
-              transformStyle: 'preserve-3d',
+              transformStyle:
+                'preserve-3d',
             }}
             animate={{
               rotateY: rotation,
@@ -707,13 +1006,6 @@ export const ProductFocus: React.FC = () => {
             {portfolioData.whatImBuilding.map(
               (item, idx) => {
 
-                /*
-                 * Slightly wider radius than the previous version.
-                 *
-                 * This keeps the cards visually separated
-                 * without making the geometry look like a
-                 * literal triangular prism.
-                 */
                 const faceRotation =
                   idx * 120;
 
@@ -729,14 +1021,17 @@ export const ProductFocus: React.FC = () => {
                         rotateY(${faceRotation}deg)
                         translateZ(210px)
                       `,
-                      transformStyle: 'preserve-3d',
-                      backfaceVisibility: 'hidden',
+                      transformStyle:
+                        'preserve-3d',
+                      backfaceVisibility:
+                        'hidden',
                     }}
                   >
 
                     {/* =================================================
                         DEPTH SHADOW
                     ================================================= */}
+
                     <div
                       className="
                         absolute
@@ -752,9 +1047,11 @@ export const ProductFocus: React.FC = () => {
                       }}
                     />
 
+
                     {/* =================================================
                         CARD
                     ================================================= */}
+
                     <div
                       className="
                         relative
@@ -769,9 +1066,8 @@ export const ProductFocus: React.FC = () => {
                       "
                     >
 
-                      {/* =================================================
-                          GRID
-                      ================================================= */}
+                      {/* Grid */}
+
                       <div
                         className="
                           absolute
@@ -796,9 +1092,9 @@ export const ProductFocus: React.FC = () => {
                         }}
                       />
 
-                      {/* =================================================
-                          SOFT RADIAL LIGHT
-                      ================================================= */}
+
+                      {/* Soft radial light */}
+
                       <motion.div
                         className="
                           absolute
@@ -826,15 +1122,18 @@ export const ProductFocus: React.FC = () => {
                         transition={{
                           duration:
                             5 + idx,
-                          repeat: Infinity,
+                          repeat:
+                            Infinity,
                           ease:
                             'easeInOut',
                         }}
                       />
 
+
                       {/* =================================================
                           CARD CONTENT
                       ================================================= */}
+
                       <div
                         className="
                           relative
@@ -851,9 +1150,15 @@ export const ProductFocus: React.FC = () => {
                         {/* =================================================
                             TOP CONTENT
                         ================================================= */}
-                        <div className="space-y-7">
+
+                        <div
+                          className="
+                            space-y-7
+                          "
+                        >
 
                           {/* Icon / Number */}
+
                           <div
                             className="
                               flex
@@ -863,6 +1168,7 @@ export const ProductFocus: React.FC = () => {
                           >
 
                             {/* Icon */}
+
                             <div
                               className="
                                 relative
@@ -877,6 +1183,7 @@ export const ProductFocus: React.FC = () => {
                                 justify-center
                               "
                             >
+
                               <div
                                 className="
                                   absolute
@@ -896,9 +1203,12 @@ export const ProductFocus: React.FC = () => {
                                   item.icon
                                 )}
                               </div>
+
                             </div>
 
+
                             {/* Number */}
+
                             <div
                               className="
                                 font-display
@@ -916,7 +1226,12 @@ export const ProductFocus: React.FC = () => {
                           {/* =================================================
                               TITLE / DESCRIPTION
                           ================================================= */}
-                          <div className="space-y-4">
+
+                          <div
+                            className="
+                              space-y-4
+                            "
+                          >
 
                             <h3
                               className="
@@ -931,6 +1246,7 @@ export const ProductFocus: React.FC = () => {
                               {item.title}
                             </h3>
 
+
                             <motion.div
                               animate={{
                                 width: [
@@ -941,7 +1257,8 @@ export const ProductFocus: React.FC = () => {
                               }}
                               transition={{
                                 duration: 4,
-                                repeat: Infinity,
+                                repeat:
+                                  Infinity,
                                 ease:
                                   'easeInOut',
                               }}
@@ -950,6 +1267,7 @@ export const ProductFocus: React.FC = () => {
                                 bg-[#4A7860]
                               "
                             />
+
 
                             <p
                               className="
@@ -964,12 +1282,14 @@ export const ProductFocus: React.FC = () => {
                             </p>
 
                           </div>
+
                         </div>
 
 
                         {/* =================================================
                             CAPABILITY SIGNALS
                         ================================================= */}
+
                         <div
                           className="
                             pt-6
@@ -992,13 +1312,19 @@ export const ProductFocus: React.FC = () => {
                             CAPABILITY SIGNALS
                           </div>
 
-                          <div className="space-y-2.5">
+
+                          <div
+                            className="
+                              space-y-2.5
+                            "
+                          >
 
                             {item.highlights.map(
                               (
                                 highlight,
                                 hIdx
                               ) => (
+
                                 <motion.div
                                   key={hIdx}
                                   initial={{
@@ -1033,6 +1359,7 @@ export const ProductFocus: React.FC = () => {
                                       shrink-0
                                     "
                                   >
+
                                     <span
                                       className="
                                         absolute
@@ -1052,7 +1379,9 @@ export const ProductFocus: React.FC = () => {
                                         bg-[#4A7860]
                                       "
                                     />
+
                                   </span>
+
 
                                   <span
                                     className="
@@ -1063,18 +1392,19 @@ export const ProductFocus: React.FC = () => {
                                   </span>
 
                                 </motion.div>
+
                               )
                             )}
 
                           </div>
+
                         </div>
 
                       </div>
 
 
-                      {/* =================================================
-                          CARD BOTTOM EDGE
-                      ================================================= */}
+                      {/* Card bottom edge */}
+
                       <div
                         className="
                           absolute
@@ -1087,16 +1417,19 @@ export const ProductFocus: React.FC = () => {
                       />
 
                     </div>
+
                   </motion.div>
                 );
               }
             )}
+
           </motion.div>
 
 
           {/* ====================================================
               ROTATION CONTROL / STATUS
           ==================================================== */}
+
           <div
             className="
               absolute
@@ -1118,6 +1451,7 @@ export const ProductFocus: React.FC = () => {
                 gap-3
               "
             >
+
               <span
                 className="
                   w-10
@@ -1147,9 +1481,12 @@ export const ProductFocus: React.FC = () => {
                   bg-[#2A2A22]
                 "
               />
+
             </div>
 
+
             {/* Position dots */}
+
             <div
               className="
                 flex
@@ -1157,6 +1494,7 @@ export const ProductFocus: React.FC = () => {
                 gap-1.5
               "
             >
+
               {portfolioData.whatImBuilding.map(
                 (_, idx) => (
                   <span
@@ -1170,11 +1508,15 @@ export const ProductFocus: React.FC = () => {
                   />
                 )
               )}
+
             </div>
 
           </div>
+
         </div>
+
       </div>
+
     </section>
   );
 };

@@ -10,7 +10,6 @@ import { ProductFocus } from './components/ProductFocus';
 import { SelectedWork } from './components/SelectedWork';
 import { SkillsSection } from './components/SkillsSection';
 import { CaseStudy } from './types';
-import { BlogSection } from './components/BlogSection';
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState<CaseStudy | null>(null);
@@ -49,14 +48,13 @@ export default function App() {
   // Active section observer for Margin Ruler
   useEffect(() => {
     const sections = [
-  { id: 'hero', code: '01' },
-  { id: 'work', code: '02' },
-  { id: 'focus', code: '03' },
-  { id: 'skills', code: '04' },
-  { id: 'insights', code: '05' },
-    { id: 'about', code: '06' },
-  { id: 'contact', code: '07' },
-];
+      { id: 'hero', code: '01' },
+      { id: 'work', code: '02' },
+      { id: 'focus', code: '03' },
+      { id: 'skills', code: '04' },
+      { id: 'about', code: '05' },
+      { id: 'contact', code: '06' },
+    ];
 
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 250;
@@ -91,7 +89,7 @@ export default function App() {
       {/* Main Content Sections */}
       <main className="relative z-10">
         {/* Section 01: Hero */}
-        <Hero onExploreClick={handleExploreClick} />
+        <Hero onExploreClick={handleExploreClick} onCollaborateClick={handleTalkClick} />
 
         {/* Section 02: Selected Work */}
         <SelectedWork onSelectProject={handleOpenCaseStudy} />
@@ -101,9 +99,6 @@ export default function App() {
 
         {/* Section 04: Technical Stack & Capabilities */}
         <SkillsSection />
-
-       {/* Section 04: Insights & Writing */}
-        <BlogSection /> 
 
         {/* Section 05: About & Leadership */}
         <About />

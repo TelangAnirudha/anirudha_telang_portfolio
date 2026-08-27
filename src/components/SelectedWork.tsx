@@ -18,7 +18,7 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
       <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#2A2A22] pb-4 gap-4">
         <div className="space-y-1">
           <div className="font-mono text-xs uppercase tracking-widest text-[#4A7860] flex items-center gap-2">
-            <span>INDEX // 02</span>
+            {/* <span>INDEX // 02</span> */}
             <span className="w-1.5 h-1.5 rounded-full bg-[#4A7860]" />
             <span className="text-[#8C887F]">FEATURED ENGAGEMENTS</span>
           </div>

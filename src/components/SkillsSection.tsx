@@ -571,9 +571,9 @@ export const SkillsSection: React.FC = () => {
               gap-2
             "
           >
-            <span>
+            {/* <span>
               TECHNICAL // 04
-            </span>
+            </span> */}
 
             <span
               className="

@@ -442,8 +442,8 @@ export const portfolioData: PortfolioData = {
     email: 'anirudha.telang@gmail.com',
     phone: '+91-8871839857',
     location: 'Pune, Maharashtra, India',
-    linkedin: 'https://linkedin.com/in/anirudhatelang',
-    github: 'https://github.com/anirudhatelang',
+    linkedin: 'https://linkedin.com/in/anirudha-telang',
+    github: 'https://github.com/TelangAnirudha',
   },
   credentials: {
     education: [

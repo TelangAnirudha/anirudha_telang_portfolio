@@ -7,11 +7,12 @@ interface MarginRulerProps {
 
 export const MarginRuler: React.FC<MarginRulerProps> = ({ currentSection = '01' }) => {
   const rulerTicks = [
-    { label: '00', title: 'SYSTEM' },
     { label: '01', title: 'HERO' },
     { label: '02', title: 'WORK' },
-    { label: '03', title: 'ABOUT' },
-    { label: '04', title: 'CONTACT' },
+    { label: '03', title: 'FOCUS' },
+    { label: '04', title: 'STACK' },
+    { label: '05', title: 'ABOUT' },
+    { label: '06', title: 'CONTACT' },
   ];
 
   return (
