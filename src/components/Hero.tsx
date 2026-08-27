@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
-import portraitImg from '../assets/images/profile_picture.jpeg';
+import portraitImg from "../assets/images/profie_picture.jpeg";
 import { portfolioData } from '../data/portfolioData';
 
 interface HeroProps {
