@@ -228,7 +228,7 @@ export const BlogSection: React.FC = () => {
               gap-2
             "
           >
-            <span>PILLARS // 04</span>
+            {/* <span>PILLARS </span> */}
 
             <span
               className="

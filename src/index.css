@@ -69,3 +69,11 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+section {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+/* Keep all sections opaque while the Hero photo stays fixed
+section:not(#hero) {
+  background-color: #14140F;
+} */

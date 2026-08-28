@@ -5,7 +5,7 @@ export const portfolioData: PortfolioData = {
     first: 'ANIRUDHA',
     last: 'TELANG',
   },
-  role: 'Product Manager',
+  role: 'Portfolio Manager',
   subtitle: 'AI & Data Products • AEC Technology',
   tagline: 'Working at the intersection of Product, Data, AI & Engineering — turning complex business problems into practical, high-impact digital products.',
   typingLines: [
